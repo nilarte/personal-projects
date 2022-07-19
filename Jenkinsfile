@@ -65,7 +65,7 @@ pipeline {
     }
     post {
         always{
-            //cleanWorkspace()
+            cleanWorkspace()
 	    print "hi"	
         }
         success {
