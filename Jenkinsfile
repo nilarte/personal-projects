@@ -31,7 +31,8 @@ pipeline {
     
     stage('Sonar Scan placeholder'){
            steps {
-             	sh "mvn sonar:sonar"	
+             	//sh "mvn sonar:sonar"
+		   sh "echo dummy placeholder"
 		
            }
 	 }	    
