@@ -1,0 +1,12 @@
+node
+{
+ stage('checkoutcode')
+ {
+  git credentialsId: '13050ec9-9d43-49f2-94d8-5a75e07e823d', url: 'https://github.com/nilarte/personal-projects.git'
+ }
+  
+ stage('Build')
+ {
+ sh "mvn clean package"
+ }
+}
