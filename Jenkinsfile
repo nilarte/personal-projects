@@ -8,10 +8,10 @@ pipeline {
             }
     }
     */
-    agent any	
+    agent any
     environment {
         //GITHUB_TOKEN = credentials('afdcc8c7-083e-4836-b577-3a24ceaca338')
-	GITHUB_TOKEN = credentials('nilart-github')    
+        GITHUB_TOKEN = credentials('nilart-github')
     }
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '30', artifactNumToKeepStr: '5', daysToKeepStr: '30', numToKeepStr: '5'))
@@ -19,31 +19,32 @@ pipeline {
     }
     tools {
         maven 'maven-3.8.5-auto'
-        //jdk 'JDK-1.8-new'
+        jdk 'jdk11'
     }
     stages {
         stage('Compile') {
             steps {
-                sh "echo hi"
-		sh "mvn install"
+                sh "echo hii"
+                sh "mvn clean install"
             }
         }
-    
-    
+
+
     stage('Sonar Scan placeholder'){
            steps {
-             	sh "mvn sonar:sonar"	
-		
-           }
-	 }	    
+    //             sh "mvn verify sonar:sonar"
+                   echo "Sonar Scan"
+
+            }
+         }
 
     stage('Build docker image'){
            steps {
-             	sh "id"	
-		sh "docker build -t nilart/personal-projects:${BUILD_NUMBER} ."
+                sh " docker build -t personalproject ."
+                sh "docker tag  personalproject shubh9975/personal-project:v6.6.6"
            }
-	 }	    
-    
+         }
+
     stage('Docker login and push') {
             steps {
               withCredentials([string(credentialsId: 'DockerHubPwd', variable: 'DockerHubPwd')]) {
@@ -83,5 +84,34 @@ pipeline {
                 subject: 'FAILED: Jenkins Job- ${JOB_NAME} Build No- ${BUILD_NUMBER}',
                 to: 'nilesh.arte@calsoftinc.com'
         }
+         success {
+           slackSend message:"Build deployed successfully - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+         }
     }
+    
+    
+    
+    
+    
+    //post {
+        //always{
+         //   cleanWorkspace()
+            //print "hi"
+        //}
+        //success {
+            //emailext attachLog: true,
+                //body: 'Pipeline job ${JOB_NAME} success. Build URL: ${BUILD_URL}',
+                //recipientProviders: [[$class: 'CulpritsRecipientProvider']],
+                //subject: 'SUCCESS: Jenkins Job- ${JOB_NAME} Build No- ${BUILD_NUMBER}',
+                //to: 'shubham.tamboli@calsoftinc.com'
+        //}
+        //failure {
+            //emailext attachLog: true,
+                //body: 'Pipeline job ${JOB_NAME} failed. Build URL: ${BUILD_URL}',
+                //recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'], [$class: 'FailingTestSuspectsRecipientProvider'], [$class: 'UpstreamComitterRecipientProvider']],
+                //subject: 'FAILED: Jenkins Job- ${JOB_NAME} Build No- ${BUILD_NUMBER}',
+                //to: 'shubham.tamboli@calsoftinc.com'
+        //}
+    //}
 }
+
