@@ -1,3 +1,4 @@
+@Library('shared_library') _
 pipeline {
     /*
     agent {
@@ -46,24 +47,42 @@ pipeline {
 
     stage('Docker login and push') {
             steps {
-                sh "docker login --username shubh9975 --password $DOCKERHUB_TOKEN"
-                sh "docker push shubh9975/personal-project:v6.6.6"
-
-            }
-         }
+              withCredentials([string(credentialsId: 'DockerHubPwd', variable: 'DockerHubPwd')]) {
+                sh "docker login -u nilart -p ${DockerHubPwd}"
+		sh "docker push  nilart/personal-projects:${BUILD_NUMBER}"
+              }
+            
+            }  
+         }  
     stage('Depoly microservice via k8s yaml on k8s setup via ansible') {
             steps {
-                sh "kubectl delete -f deployment/tests/demo.yaml"
-                sh "ansible-playbook deployment/tests/test.yml -vvv"
-           }
-         }
-  
-}
-    post
-     {
-       failure 
-       {
-           slackSend message:"Build failed  - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+              withCredentials([string(credentialsId: 'DockerHubPwd', variable: 'DockerHubPwd')]) {
+                sh "echo use_ansibleplaybook_to_deploy_simple_pod_servie_depolyment_yml"
+		
+              }
+            
+            }  
+         }    
+	    
+    }
+    post {
+        always{
+            cleanWorkspace()
+	    print "hi"	
+        }
+        success {
+            emailext attachLog: true,
+                body: 'Pipeline job ${JOB_NAME} success. Build URL: ${BUILD_URL}',
+                recipientProviders: [[$class: 'CulpritsRecipientProvider']],
+                subject: 'SUCCESS: Jenkins Job- ${JOB_NAME} Build No- ${BUILD_NUMBER}',
+                to: 'nilesh.arte@calsoftinc.com'
+        }
+        failure {
+            emailext attachLog: true,
+                body: 'Pipeline job ${JOB_NAME} failed. Build URL: ${BUILD_URL}',
+                recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'], [$class: 'FailingTestSuspectsRecipientProvider'], [$class: 'UpstreamComitterRecipientProvider']],
+                subject: 'FAILED: Jenkins Job- ${JOB_NAME} Build No- ${BUILD_NUMBER}',
+                to: 'nilesh.arte@calsoftinc.com'
         }
          success {
            slackSend message:"Build deployed successfully - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
