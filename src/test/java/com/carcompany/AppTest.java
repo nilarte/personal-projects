@@ -21,13 +21,20 @@ public class AppTest {
     }
 
     @Test
-    public void getCoolingTimeInMin() { 
-    //Co pilot generated this test case    
+    public void getCoolingTimeInMin() {
+    //Co pilot generated this test case
         App app = new App();
         int cooling_time = app.getCoolingTimeInMin();
         boolean is_cooling_decent = false;
         if (cooling_time < 5) is_cooling_decent = true;
         assertEquals("Cooling time is: " + cooling_time, true, is_cooling_decent);
+    }
+
+    @Test
+    public void getTurningRadius() {
+        App app = new App();
+        double radius = app.getTurningRadius(2.5, 30);
+        assertEquals(5.0, radius, 0.0001);
     }
     
     
