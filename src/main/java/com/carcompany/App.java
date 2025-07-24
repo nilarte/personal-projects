@@ -34,6 +34,21 @@ public class App {
         return randomNumber;
     }
 
+    /**
+     * Calculate the turning radius of the vehicle.
+     *
+     * @param wheelBase      distance between the front and rear axles in metres
+     * @param steeringAngle  steering angle in degrees
+     * @return the turning radius in metres
+     */
+    public double getTurningRadius(double wheelBase, double steeringAngle) {
+        if (steeringAngle == 0) {
+            return Double.POSITIVE_INFINITY;
+        }
+        double angleRad = Math.toRadians(steeringAngle);
+        return wheelBase / Math.sin(angleRad);
+    }
+
     public static void main(String[] args) {
         System.out.println(new App().getMessage());
     }
